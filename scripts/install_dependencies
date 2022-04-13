@@ -1,1 +1,63 @@
+#!/bin/bash
+sudo apt update
+sudo apt install python3-pip -y
+sudo apt install python3-dev -y  
+sudo apt install nginx -y
+sudo apt install python3-django -y
+sudo pip install django gunicorn
+sudo apt install gunicorn -y
+sudo pip3 install virtualenv 
+mkdir /home/ubnutu/projectdir
+cd /home/ubuntu/projectdir || exit
+virtualenv env
+source /home/ubuntu/projectdir/env/bin/activate
+sudo django-admin startproject textutils /home/ubuntu/projectdir
+sudo /home/ubuntu/projectdir/manage.py makemigrations
+sudo /home/ubuntu/projectdir/manage.py migrate
+deactivate
+sudo touch /etc/systemd/system/gunicorn.socket
+sudo chmod 777 /etc/systemd/system/gunicorn.socket
+echo "[Unit]
+Description=gunicorn socket
+[Socket]
+ListenStream=/run/gunicorn.sock
+[Install]
+WantedBy=sockets.target
+" > /etc/systemd/system/gunicorn.socket
+sudo touch /etc/systemd/system/gunicorn.service
+sudo chmod 777 /etc/systemd/system/gunicorn.service
+echo " [Unit]
+Description=gunicorn daemon
+Requires=gunicorn.socket
+After=network.target
+[Service]
+User=ubuntu
+Group=www-data
+WorkingDirectory=/home/ubuntu/projectdir
+ExecStart=/home/ubuntu/projectdir/env/bin/gunicorn \
+          --access-logfile - \
+          --workers 3 \
+          --bind unix:/run/gunicorn.sock \
+          textutils.wsgi:application
+[Install]
+WantedBy=multi-user.target
+" > /etc/systemd/system/gunicorn.service
+sudo systemctl start gunicorn.socket
+sudo systemctl enable gunicorn.socket
+sudo touch /etc/nginx/sites-available/textutils
+sudo chmod 777 /etc/nginx/sites-available/textutils
+echo " server {
+    listen 80;
+    server_name 13.233.11.210 ;
+    location = /favicon.ico { access_log off; log_not_found off; }
+    location /static/ {
+        root /home/ubuntu/projectdir;
+    }
+    location / {
+        include proxy_params;
+        proxy_pass http://unix:/run/gunicorn.sock;
+    }
+} " > /etc/nginx/sites-available/textutils
+sudo ln -s /etc/nginx/sites-available/textutils /etc/nginx/sites-enabled/
+sudo systemctl restart nginx
 
