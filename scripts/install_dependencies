@@ -11,7 +11,6 @@ mkdir /home/ubnutu/projectdir
 cd /home/ubuntu/projectdir || exit
 virtualenv env
 source /home/ubuntu/projectdir/env/bin/activate
-sudo django-admin startproject textutils /home/ubuntu/projectdir
 sudo /home/ubuntu/projectdir/manage.py makemigrations
 sudo /home/ubuntu/projectdir/manage.py migrate
 deactivate
