@@ -4,13 +4,14 @@ sudo apt install python3-pip -y
 sudo apt install python3-dev -y  
 sudo apt install nginx -y
 sudo apt install python3-django -y
-sudo pip install django gunicorn
 sudo apt install gunicorn -y
 sudo pip3 install virtualenv 
 mkdir /home/ubuntu/projectdir
 cd /home/ubuntu/projectdir || exit
 virtualenv env
 source /home/ubuntu/projectdir/env/bin/activate
+sudo chown -R ubuntu:ubuntu /home/ubuntu/projectdir/
+pip install django gunicorn
 sudo /home/ubuntu/projectdir/manage.py makemigrations
 sudo /home/ubuntu/projectdir/manage.py migrate
 deactivate
@@ -59,4 +60,3 @@ echo " server {
 } " > /etc/nginx/sites-available/textutils
 sudo ln -s /etc/nginx/sites-available/textutils /etc/nginx/sites-enabled/
 sudo systemctl restart nginx
-
