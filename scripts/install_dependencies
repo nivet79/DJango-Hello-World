@@ -7,7 +7,7 @@ sudo apt install python3-django -y
 sudo pip install django gunicorn
 sudo apt install gunicorn -y
 sudo pip3 install virtualenv 
-mkdir /home/ubnutu/projectdir
+mkdir /home/ubuntu/projectdir
 cd /home/ubuntu/projectdir || exit
 virtualenv env
 source /home/ubuntu/projectdir/env/bin/activate
